@@ -22,6 +22,9 @@ dependencies:
   http: ^0.12.0+2
   font_awesome_flutter: ^8.5.0
   url_launcher: ^5.1.0
+  rflutter_alert: ^1.0.3
+  shared_preferences: ^0.5.3+4
+  intl: ^0.15.8
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
@@ -45,8 +48,16 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/bayar.png
+    - assets/car.png
     - assets/crown.png
+    - assets/food.png
     - assets/grab.jpg
+    - assets/more.png
+    - assets/package.png
+    - assets/pulsa.png
+    - assets/save-money.png
+    - assets/scooter.png
+    - assets/ticket.png
     - assets/wallet.png
   #  - images/a_dot_ham.jpeg
 

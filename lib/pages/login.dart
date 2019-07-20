@@ -1,6 +1,8 @@
 import 'package:fake_grab/config/api.dart';
+import 'package:fake_grab/model/phone.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Login extends StatefulWidget {
@@ -25,24 +27,69 @@ class LoginState extends State<Login> {
       });
       requestCount += 1;
       api.login(phoneNumber.text).then((phoneNumberResponse) {
+        if (phoneNumberResponse.data.length != 0) {
+          phoneNumberResponse.data.first
+              .saveToSharedPreference()
+              .then((sharedPreference) {
+            requestCount = 0;
+            setState(() {
+              request = false;
+            });
+            _scaffoldKey.currentState.showSnackBar(SnackBar(
+              content:
+                  Text("Selamat Datang " + phoneNumberResponse.data.first.name),
+              duration: Duration(seconds: 1),
+            ));
+            Navigator.of(context).pushReplacementNamed("/home");
+          });
+        } else {
+          requestCount = 0;
+          setState(() {
+            request = false;
+          });
+          _scaffoldKey.currentState.showSnackBar(SnackBar(
+            content: Text("Nomor tidak ditemukan"),
+            duration: Duration(seconds: 1),
+          ));
+        }
+      }).catchError((error) {
         requestCount = 0;
         setState(() {
           request = false;
         });
-        if (phoneNumberResponse.data.length != 0) {
-          _scaffoldKey.currentState.showSnackBar(SnackBar(
-            content:
-                Text("Selamat Datang " + phoneNumberResponse.data.first.name),
-            duration: Duration(seconds: 3),
-          ));
-        } else {
-          _scaffoldKey.currentState.showSnackBar(SnackBar(
-            content: Text("Nomor tidak ditemukan"),
-            duration: Duration(seconds: 3),
-          ));
-        }
+        _serverFailed(context);
       });
     }
+  }
+
+  _serverFailed(context) {
+    Alert(
+      context: context,
+      type: AlertType.warning,
+      title: "Tidak Dapat Terhubung",
+      desc: "Gunakan data palsu saja dengan nomor sekarang ?",
+      buttons: [
+        DialogButton(
+          child: Text(
+            "Ya",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: _loginFakeData(),
+          color: Color.fromRGBO(0, 179, 134, 1.0),
+        ),
+        DialogButton(
+          child: Text(
+            "Tidak",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: () => Navigator.pop(context),
+          gradient: LinearGradient(colors: [
+            Color.fromRGBO(116, 116, 191, 1.0),
+            Color.fromRGBO(52, 138, 199, 1.0)
+          ]),
+        )
+      ],
+    ).show();
   }
 
   _openFacebook() async {
@@ -72,14 +119,26 @@ class LoginState extends State<Login> {
     }
   }
 
+  _loginFakeData() {
+    Phone(
+      id: 1,
+      phoneNumber: phoneNumber.text,
+      country: 0,
+      name: "User",
+      saldo: 0,
+    ).saveToSharedPreference().then((sharedPreference) {
+      Navigator.of(context).pushReplacementNamed("/home");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Material(
-        child: Scaffold(
-          key: _scaffoldKey,
-          backgroundColor: Color(0xff019e35),
-          body: ListView(
+    return Material(
+      child: Scaffold(
+        key: _scaffoldKey,
+        backgroundColor: Color(0xff019e35),
+        body: SafeArea(
+          child: ListView(
             children: <Widget>[
               SizedBox(
                 height: 50.0,
@@ -120,6 +179,8 @@ class LoginState extends State<Login> {
                     TextField(
                       controller: phoneNumber,
                       style: TextStyle(color: Colors.white),
+                      keyboardType: TextInputType.numberWithOptions(
+                          signed: false, decimal: false),
                       decoration: InputDecoration(
                         labelText: "Phone Number",
                         labelStyle: TextStyle(color: Colors.white),
@@ -161,45 +222,45 @@ class LoginState extends State<Login> {
               )
             ],
           ),
-          bottomNavigationBar: Container(
-            height: 65.0,
-            color: Colors.white,
-            child: Center(
-              child: Row(
-                children: <Widget>[
-                  SizedBox(
-                    width: 20.0,
+        ),
+        bottomNavigationBar: Container(
+          height: 65.0,
+          color: Colors.white,
+          child: Center(
+            child: Row(
+              children: <Widget>[
+                SizedBox(
+                  width: 20.0,
+                ),
+                Text(
+                  "By Supan Adit Pratama",
+                ),
+                SizedBox(
+                  width: 5.0,
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      IconButton(
+                        // Use the FontAwesomeIcons class for the IconData
+                        icon: new Icon(FontAwesomeIcons.facebook),
+                        onPressed: _openFacebook,
+                      ),
+                      IconButton(
+                        // Use the FontAwesomeIcons class for the IconData
+                        icon: new Icon(FontAwesomeIcons.linkedin),
+                        onPressed: _openLinkedin,
+                      ),
+                      IconButton(
+                        // Use the FontAwesomeIcons class for the IconData
+                        icon: new Icon(FontAwesomeIcons.github),
+                        onPressed: _openGithub,
+                      )
+                    ],
                   ),
-                  Text(
-                    "By Supan Adit Pratama",
-                  ),
-                  SizedBox(
-                    width: 5.0,
-                  ),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        IconButton(
-                          // Use the FontAwesomeIcons class for the IconData
-                          icon: new Icon(FontAwesomeIcons.facebook),
-                          onPressed: _openFacebook,
-                        ),
-                        IconButton(
-                          // Use the FontAwesomeIcons class for the IconData
-                          icon: new Icon(FontAwesomeIcons.linkedin),
-                          onPressed: _openLinkedin,
-                        ),
-                        IconButton(
-                          // Use the FontAwesomeIcons class for the IconData
-                          icon: new Icon(FontAwesomeIcons.github),
-                          onPressed: _openGithub,
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ),
+                )
+              ],
             ),
           ),
         ),

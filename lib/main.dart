@@ -1,3 +1,4 @@
+import 'package:fake_grab/pages/home.dart';
 import 'package:fake_grab/pages/login.dart';
 /**
  * Aplikasi Fake Grab ( Grab Palsu )
@@ -7,10 +8,21 @@ import 'package:fake_grab/pages/login.dart';
  */
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(FakeGrab());
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class FakeGrab extends StatefulWidget {
+  @override
+  State createState() {
+    return new FakeGrabState();
+  }
+}
+
+class FakeGrabState extends State<FakeGrab> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,7 +30,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Login(),
+      home: Home(),
+      routes: <String, WidgetBuilder>{
+        '/login': (BuildContext context) => new Login(),
+        '/home': (BuildContext context) => new Home(),
+      },
     );
   }
 }
